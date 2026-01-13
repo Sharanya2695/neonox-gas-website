@@ -12,6 +12,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ===============================
+   EMAILJS GLOBAL SDK
+   (Loaded via <script> in index.html)
+   =============================== */
+// global emailjs object is available
+
+/* ===============================
    FIREBASE CONFIG
    =============================== */
 const firebaseConfig = {
@@ -44,8 +50,9 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ contactForm found");
 
     /* ===============================
-       INIT EMAILJS (GLOBAL)
+       INIT EMAILJS
        =============================== */
+    // Must match your EmailJS public key
     emailjs.init("g6Hlg8TnHqgTRnAGr"); // PUBLIC KEY
 
     /* ===============================
@@ -63,7 +70,9 @@ document.addEventListener("DOMContentLoaded", () => {
         status.innerText = "Sending message...";
 
         try {
-            /* SAVE TO FIRESTORE */
+            /* ===============================
+               SAVE TO FIRESTORE
+               =============================== */
             await addDoc(collection(db, "contacts"), {
                 name,
                 phone,
@@ -72,20 +81,36 @@ document.addEventListener("DOMContentLoaded", () => {
                 createdAt: serverTimestamp()
             });
 
-            console.log("✅ Firestore saved");
+            console.log("✅ Saved to Firestore");
 
-            /* SEND EMAIL (GLOBAL EMAILJS) */
+            /* ===============================
+               SEND ADMIN EMAIL
+               =============================== */
             await emailjs.send(
-                "service_ln9zoal",
-                "template_nqqxrd6",
+                "service_ln9zoal",        // your EmailJS Service ID
+                "template_admin123",      // your Admin Email Template ID
                 {
-                    name,
-                    email,
-                    message
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    message: message
                 }
             );
+            console.log("📧 Admin email sent");
 
-            console.log("✅ Email sent");
+            /* ===============================
+               SEND USER CONFIRMATION EMAIL
+               =============================== */
+            await emailjs.send(
+                "service_ln9zoal",        // same service
+                "template_9cogyj7",       // your User Confirmation Template ID
+                {
+                    name: name,
+                    email: email,
+                    message: message
+                }
+            );
+            console.log("📧 User confirmation email sent");
 
             status.style.color = "green";
             status.innerText = "Message sent successfully!";
