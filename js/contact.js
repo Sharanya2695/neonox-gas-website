@@ -12,16 +12,6 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 /* ===============================
-   EMAILJS – OFFICIAL BROWSER SDK
-   =============================== */
-import emailjs from "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
-
-/* ===============================
-   EMAILJS INITIALIZATION
-   =============================== */
-emailjs.init("g6Hlg8TnHqgTRnAGr"); // ✅ PUBLIC KEY
-
-/* ===============================
    FIREBASE CONFIG
    =============================== */
 const firebaseConfig = {
@@ -43,8 +33,6 @@ const db = getFirestore(app);
    WAIT FOR DOM
    =============================== */
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("✅ DOM loaded");
-
     const form = document.getElementById("contactForm");
     const status = document.getElementById("status");
 
@@ -56,11 +44,15 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ contactForm found");
 
     /* ===============================
+       INIT EMAILJS (GLOBAL)
+       =============================== */
+    emailjs.init("g6Hlg8TnHqgTRnAGr"); // PUBLIC KEY
+
+    /* ===============================
        FORM SUBMIT HANDLER
        =============================== */
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        console.log("📨 Form submitted");
 
         const name = document.getElementById("name").value.trim();
         const phone = document.getElementById("phone").value.trim();
@@ -71,9 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
         status.innerText = "Sending message...";
 
         try {
-            /* ===============================
-               SAVE TO FIRESTORE
-               =============================== */
+            /* SAVE TO FIRESTORE */
             await addDoc(collection(db, "contacts"), {
                 name,
                 phone,
@@ -84,16 +74,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             console.log("✅ Firestore saved");
 
-            /* ===============================
-               SEND EMAIL VIA EMAILJS
-               =============================== */
+            /* SEND EMAIL (GLOBAL EMAILJS) */
             await emailjs.send(
-                "service_ipzbap7",     // SERVICE ID
-                "template_nqqxrd6",    // TEMPLATE ID
+                "service_ipzbap7",
+                "template_nqqxrd6",
                 {
-                    name: name,
-                    email: email,
-                    message: message
+                    name,
+                    email,
+                    message
                 }
             );
 
