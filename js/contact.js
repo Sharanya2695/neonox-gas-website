@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             /* SEND EMAIL (GLOBAL EMAILJS) */
             await emailjs.send(
-                "service_ipzbap7",
+                "service_ln9zoal",
                 "template_nqqxrd6",
                 {
                     name,
