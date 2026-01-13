@@ -1,9 +1,11 @@
-// -------------------------------
-// FIREBASE + EMAILJS CONFIG
-// -------------------------------
+/**************************************************
+ * DEBUG – CONFIRM FILE LOADS
+ **************************************************/
 console.log("🔥 firebase.js loaded");
 
-// Firebase SDKs
+/**************************************************
+ * FIREBASE IMPORTS (ES MODULES)
+ **************************************************/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
     getFirestore,
@@ -12,17 +14,20 @@ import {
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// EmailJS SDK
-import emailjs from "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
+/**************************************************
+ * EMAILJS IMPORT (ES MODULE – IMPORTANT)
+ * NOTE: EmailJS CDN does NOT export default
+ **************************************************/
+import * as emailjs from "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
 
-// -------------------------------
-// EMAILJS INITIALIZATION
-// -------------------------------
-emailjs.init("g6Hlg8TnHqgTRnAGr");
+/**************************************************
+ * EMAILJS INITIALIZATION
+ **************************************************/
+emailjs.init("g6Hlg8TnHqgTRnAGr"); // ✅ your PUBLIC KEY
 
-// -------------------------------
-// FIREBASE CONFIG
-// -------------------------------
+/**************************************************
+ * FIREBASE CONFIG (KEEP AS IS)
+ **************************************************/
 const firebaseConfig = {
     apiKey: "AIzaSyBIIQhoODtl9bIH0AjLboivVfmHW-u6vrI",
     authDomain: "neonox-gas-website.firebaseapp.com",
@@ -32,15 +37,15 @@ const firebaseConfig = {
     appId: "1:117304932628:web:282c28c56c007d5c5e6a01"
 };
 
-// -------------------------------
-// INITIALIZE FIREBASE
-// -------------------------------
+/**************************************************
+ * INITIALIZE FIREBASE
+ **************************************************/
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// -------------------------------
-// WAIT FOR DOM (🔥 THIS WAS MISSING)
-// -------------------------------
+/**************************************************
+ * WAIT FOR DOM BEFORE ACCESSING ELEMENTS
+ **************************************************/
 document.addEventListener("DOMContentLoaded", () => {
     console.log("✅ DOM fully loaded");
 
@@ -48,15 +53,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const status = document.getElementById("status");
 
     if (!form) {
-        console.error("❌ contactForm not found");
+        console.error("❌ contactForm not found in DOM");
         return;
     }
-
     console.log("✅ contactForm found");
 
-    // -------------------------------
-    // FORM SUBMIT HANDLER
-    // -------------------------------
+    /**************************************************
+     * FORM SUBMIT HANDLER
+     **************************************************/
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
         console.log("📨 Form submit triggered");
@@ -70,9 +74,9 @@ document.addEventListener("DOMContentLoaded", () => {
         status.innerText = "Sending message...";
 
         try {
-            // -------------------------------
-            // SAVE TO FIRESTORE
-            // -------------------------------
+            /**************************************************
+             * SAVE TO FIRESTORE
+             **************************************************/
             console.log("💾 Saving to Firestore...");
             await addDoc(collection(db, "contacts"), {
                 name,
@@ -83,13 +87,13 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             console.log("✅ Firestore save success");
 
-            // -------------------------------
-            // SEND EMAIL VIA EMAILJS
-            // -------------------------------
-            console.log("📧 Sending email...");
+            /**************************************************
+             * SEND EMAIL VIA EMAILJS
+             **************************************************/
+            console.log("📧 Sending email via EmailJS...");
             await emailjs.send(
-                "service_ipzbap7",     // ✅ correct
-                "template_nqqxrd6",    // ✅ correct
+                "service_ipzbap7",      // ✅ SERVICE ID (do not change)
+                "template_nqqxrd6",     // ✅ TEMPLATE ID
                 {
                     name,
                     email,
