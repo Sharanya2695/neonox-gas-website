@@ -1,10 +1,32 @@
-// 🔥 DEBUG – must appear in console
+
+
+
+
+// -------------------------------
+// FIREBASE + EMAILJS CONFIG
+// -------------------------------
+
+// Firebase SDKs
 console.log("🔥 firebase.js loaded");
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ✅ YOUR FIREBASE CONFIG (OK)
+// EmailJS SDK
+import emailjs from "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
+
+
+// -------------------------------
+// EMAILJS INITIALIZATION
+// -------------------------------
+// 🔴 REPLACE WITH YOUR ACTUAL PUBLIC KEY
+emailjs.init("g6Hlg8TnHqgTRnAGr");
+
+
+// -------------------------------
+// FIREBASE CONFIG
+// -------------------------------
+// 🔴 KEEP YOUR ORIGINAL FIREBASE VALUES
 const firebaseConfig = {
     apiKey: "AIzaSyBIIQhoODtl9bIH0AjLboivVfmHW-u6vrI",
     authDomain: "neonox-gas-website.firebaseapp.com",
@@ -14,42 +36,66 @@ const firebaseConfig = {
     appId: "1:117304932628:web:282c28c56c007d5c5e6a01"
 };
 
-// 🔗 Initialize Firebase
+
+// -------------------------------
+// INITIALIZE FIREBASE
+// -------------------------------
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 📌 Get form & fields (THIS WAS MISSING)
+
+// -------------------------------
+// FORM HANDLING
+// -------------------------------
 const form = document.getElementById("contactForm");
 const status = document.getElementById("status");
 
-const nameInput = document.getElementById("name");
-const phoneInput = document.getElementById("phone");
-const emailInput = document.getElementById("email");
-const messageInput = document.getElementById("message");
-
-// 🧪 Debug
-console.log("Form found:", form);
-
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    console.log("🚀 Submit clicked");
+
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const message = document.getElementById("message").value.trim();
+
+    status.style.color = "black";
+    status.innerText = "Sending message...";
 
     try {
+        // -------------------------------
+        // SAVE TO FIREBASE
+        // -------------------------------
         await addDoc(collection(db, "contacts"), {
-            name: nameInput.value,
-            phone: phoneInput.value,
-            email: emailInput.value,
-            message: messageInput.value,
-            createdAt: new Date()
+            name,
+            phone,
+            email,
+            message,
+            createdAt: serverTimestamp()
         });
 
+        // -------------------------------
+        // SEND EMAIL VIA EMAILJS
+        // -------------------------------
+        await emailjs.send(
+            "service_ipzbap7",          // SERVICE ID
+            "template_nqqxrd6",         // TEMPLATE ID
+            {
+                name: name,
+                email: email,
+                message: message
+            }
+        );
+
+        // -------------------------------
+        // SUCCESS
+        // -------------------------------
         status.style.color = "green";
         status.innerText = "Message sent successfully!";
         form.reset();
 
     } catch (error) {
-        console.error("Firebase error:", error);
+        console.error("Error:", error);
         status.style.color = "red";
-        status.innerText = error.message;
+        status.innerText = "Error sending message. Please try again later.";
     }
 });
